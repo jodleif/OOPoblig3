@@ -1,6 +1,7 @@
 package virtualm.logikk;
 
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
@@ -15,6 +16,7 @@ public class Input
 	private boolean stdin = true;
 
 	private IntSupplier intSuppl;
+	private Supplier<String> strSupplier;
 
 	public Input()
 	{
@@ -47,14 +49,17 @@ public class Input
 			}
 			return i;
 		} else {
-			return read();
+			return strSupplier.get().charAt(0);
 		}
 	}
 
-	public void setIntSuppl(IntSupplier intSuppl)
+	public void setSuppliers(IntSupplier intSuppl, Supplier<String> strSupplier)
 	{
+		if (intSuppl == null || strSupplier == null)
+			throw new IllegalArgumentException("Du må sette både intsuppl og strsupplier!");
 		stdin = false;
 		this.intSuppl = intSuppl;
+		this.strSupplier = strSupplier;
 	}
 
 	private int readIntConsole()

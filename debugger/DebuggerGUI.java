@@ -15,7 +15,7 @@ import virtualm.logikk.Parser;
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
  *
- * Hovedklasse for debugger guiet.
+ * Hovedklasse for debugger GUIet.
  */
 public class DebuggerGUI extends Application
 {
@@ -35,6 +35,8 @@ public class DebuggerGUI extends Application
 	private Button lastTilRam, run, step, exit;
 	private DebugPane debugPane;
 
+	private Meny menyBar;
+
 
 	@Override
 	public void start(Stage primaryStage) throws Exception
@@ -45,27 +47,14 @@ public class DebuggerGUI extends Application
 		virtualM = new M();
 		virtualM.setConsumer(s -> statusLinje.setText(statusLinje.getText() + s));
 
-		virtualM.setIntSupplier(() -> {
-			while (true) {
-				Dialog<String> d = new TextInputDialog();
-				d.setContentText("Skriv inn et tall mellom 0-255");
-				String s = d.showAndWait().get();
-				try {
-					int i = Integer.parseInt(s);
-					if (i < 255) return i;
-				} catch (Exception e) {
-					printAlert(e.getMessage());
-				}
-			}
-		});
-
+		virtualM.setSupplier(this::hentHeltall, this::hentBokstav); // Metode referanse!!!
+		menyBar = new Meny(this);
 		setupLayout();
 		setupButtons();
 		setupDebugPane();
 		setupKnappActions();
-
 		root.getChildren().add(bp);
-
+		bp.setTop(menyBar);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
@@ -97,24 +86,7 @@ public class DebuggerGUI extends Application
 
 	private void setupKnappActions()
 	{
-		lastTilRam.setOnAction(event -> {
-			int[] programTilRam;
-			try {
-				String s = codeView.getText();
-				if (s == null || s.length() == 0) {
-					printAlert("Ingen kode skrevet inn!");
-					return;
-				}
-				programTilRam = Parser.kodeTilRam(s);
-				if (programTilRam != null) {
-					virtualM.loadIntoRam(programTilRam);
-					statusLinje.setText("Program lastet ok!");
-					debugPane.oppdater();
-				}
-			} catch (Exception e) {
-				printAlert("ERROR PARSING\n" + e.getMessage());
-			}
-		});
+		lastTilRam.setOnAction((event) -> lastTekstTilRam());
 
 		run.setOnAction(event -> {
 			if (virtualM.emptyRam()) {
@@ -140,7 +112,7 @@ public class DebuggerGUI extends Application
 		exit.setOnAction(event -> {
 			virtualM.reset();
 			debugPane.oppdater();
-			statusLinje.setText("");
+			statusLinje.setText("Minnet tømt! VM resatt!");
 		});
 	}
 
@@ -154,5 +126,55 @@ public class DebuggerGUI extends Application
 	{
 		Alert alert = new Alert(Alert.AlertType.ERROR, s);
 		alert.show();
+	}
+
+	private void lastTekstTilRam()
+	{
+		int[] programTilRam;
+		try {
+			String s = codeView.getText();
+			if (s == null || s.length() == 0) {
+				printAlert("Ingen kode skrevet inn!");
+				return;
+			}
+			programTilRam = Parser.kodeTilRam(s);
+			if (programTilRam != null) {
+				virtualM.loadIntoRam(programTilRam);
+				statusLinje.setText("Program lastet ok!");
+				debugPane.oppdater();
+			}
+		} catch (Exception e) {
+			printAlert("ERROR PARSING\n" + e.getMessage());
+		}
+	}
+
+	private String hentBokstav()
+	{
+		while (true) {
+			Dialog<String> d = new TextInputDialog();
+			d.setContentText("Skriv inn et tegn(Hvis du skriver flere tegn sendes kun det første");
+			String s = d.showAndWait().get();
+			if (s.length() >= 0) return s;
+		}
+	}
+
+	private int hentHeltall()
+	{
+		while (true) {
+			Dialog<String> d = new TextInputDialog();
+			d.setContentText("Skriv inn et tall mellom 0-255");
+			String s = d.showAndWait().get();
+			try {
+				int i = Integer.parseInt(s);
+				if (i < 255) return i;
+			} catch (Exception e) {
+				printAlert(e.getMessage());
+			}
+		}
+	}
+
+	void settCodeViewTekst(String tekst)
+	{
+		this.codeView.setText(tekst);
 	}
 }

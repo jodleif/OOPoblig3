@@ -2,6 +2,8 @@ package virtualm.logikk;
 
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
+ *
+ * Liste over gyldige "opcodes" for oppslag - begge veier
  */
 public enum opcode
 {
@@ -51,7 +53,7 @@ public enum opcode
 	public static opcode getCode(String code)
 	{
 		for(opcode op : opcode.values()){
-			if(op.getString().equals(code))
+			if (op.getString().equals(code.toUpperCase()))
 				return op;
 		}
 		if (code.equals("RSET")) return opcode.MOV; // Følge spesifikasjon

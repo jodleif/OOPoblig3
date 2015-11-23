@@ -1,7 +1,10 @@
 package virtualm.logikk;
 
+import virtualm.fileio.FilIO;
+
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
@@ -31,18 +34,11 @@ public class M
  /* Initialisering av instansvariabler */
 	}
 
-	public void loadProgram(String kode)
+	public void loadProgram(String filsti)
 	{
-		String kodeFraFil = kode; // Dummy lastet inn
-		// last fil
-		int[] program = Parser.kodeTilRam(kodeFraFil);
-		minneområde = program.length; // Starter "RAM" fra minneområde;
- /*
- * Nullstill instansvariabler
- * Åpne fil
- * Les inn program fra fil, linje for linje
- * Lukk fil
- */
+		String kodeFraFil = FilIO.lesFil(filsti); // Laster inn alle linjer fra fil.
+		int[] program = Parser.kodeTilRam(kodeFraFil); // "oversetter" til bytecode
+		loadIntoRam(program); // Laster inn programmet i starten av minnet
 	}
 
 	public boolean stepProgram() throws IllegalArgumentException
@@ -54,12 +50,11 @@ public class M
 		opcode curr_op = opcode.getCode(RAM[PC]);
 		int adr;
 		switch (curr_op) {
-
 			case IREAD:
 				R = input.read();
 				break;
 			case IWRITE:
-				output.print(String.valueOf(R));
+				output.print(String.valueOf(R) + "\n");
 				break;
 			case CREAD:
 				R = input.readc();
@@ -83,16 +78,23 @@ public class M
 				break;
 			case ADD:
 				++PC;
-				R += RAM[PC];
+				adr = oversettAdresse(RAM[PC]);
+				R += RAM[adr];
 				break;
 			case SUB:
-				R -= RAM[PC];
+				++PC;
+				adr = oversettAdresse(RAM[PC]);
+				R -= RAM[adr];
 				break;
 			case MULT:
-				R *= RAM[PC];
+				++PC;
+				adr = oversettAdresse(RAM[PC]);
+				R *= RAM[adr];
 				break;
 			case DIV:
-				R /= RAM[PC];
+				++PC;
+				adr = oversettAdresse(RAM[PC]);
+				R /= RAM[adr];
 				break;
 			case JUMP:
 				++PC;
@@ -102,14 +104,14 @@ public class M
 				++PC;
 				if (R < 0) {
 					PC = RAM[PC];
-					return false;
+					return false; // Ikke inkrementere PC!!
 				}
 				break;
 			case JZERO:
 				++PC;
 				if (PC == 0) {
 					PC = RAM[PC];
-					return false;
+					return false; // Ikke inkrementere PC!!
 				}
 				break;
 			case STOP:
@@ -129,20 +131,10 @@ public class M
  * Utfør neste instruksjon (stepProgram)
  * Vis avsluttende melding
  */
-		while (!stepProgram()) {
-			stepProgram();
-		}
+		while (!stepProgram()) ; // Kjør til programmet er ferdig(returnerer true)
 	}
 
-	public static void main(String[] args)
-	{
- /*
- * Hent filnavn fra kommandolinje (args[0])
- * Lag et M-objekt
- * Last program fra fil (loadProgram)
- * Utfør programmet (executeProgram)
- */
-	}
+
  /* Eventuelle hjelpemetoder */
 
 	public int[] getRAM()
@@ -187,11 +179,10 @@ public class M
 		output.setConsumer(c);
 	}
 
-	public void setIntSupplier(IntSupplier s)
+	public void setSupplier(IntSupplier s, Supplier<String> cSupplier)
 	{
-		input.setIntSuppl(s);
+		input.setSuppliers(s, cSupplier);
 	}
-
 	public void reset()
 	{
 		minneområde = 0;
