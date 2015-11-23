@@ -1,6 +1,7 @@
 package virtualm.logikk;
 
 import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
@@ -15,13 +16,14 @@ public class M
 	private int minneområde;
 	private int R; // Register
 	private int PC; // Programteller
-	private Output output;
+	private Output output; // Håndterer output
+	private Input input; // Håndterer input
 
 	// Flere instansvariabler?
 	public M()
 	{
-		output = new Output(false);
-		//output.setWaitForNewline(true);
+		output = new Output();
+		input = new Input();
 		RAM = new int[RAM_SIZE];
 		minneområde = 0;
 		R = 0;
@@ -50,15 +52,17 @@ public class M
  * Utfør instruksjonen (og oppdater programtelleren)
  */
 		opcode curr_op = opcode.getCode(RAM[PC]);
-		int adr = 0;
+		int adr;
 		switch (curr_op) {
 
 			case IREAD:
+				R = input.read();
 				break;
 			case IWRITE:
 				output.print(String.valueOf(R));
 				break;
 			case CREAD:
+				R = input.readc();
 				break;
 			case CWRITE:
 				output.print(String.valueOf((char) R));
@@ -168,15 +172,14 @@ public class M
 		if (program.length > RAM_SIZE) return false;
 		reset();
 		minneområde = program.length;
-		for (int i = 0; i < program.length; ++i) {
-			RAM[i] = program[i];
-		}
+		System.arraycopy(program, 0, RAM, 0, program.length);
 		return true;
 	}
 
 	private void stop()
 	{
-		output.print("Finished!\n");
+		output.print("Ferdig! ");
+		output.print("Ledig minne: " + (255 - getPC()) + "\n");
 	}
 
 	public void setConsumer(Consumer<String> c)
@@ -184,11 +187,26 @@ public class M
 		output.setConsumer(c);
 	}
 
-	private void reset()
+	public void setIntSupplier(IntSupplier s)
+	{
+		input.setIntSuppl(s);
+	}
+
+	public void reset()
 	{
 		minneområde = 0;
 		PC = 0;
 		R = 0;
 		RAM = new int[RAM_SIZE]; // RESET RAM
+	}
+
+	/**
+	 * Funksjon som sjekker om minnet er tomt. Antar at minnet er tomt dersom første celle er lik 0
+	 *
+	 * @return tomt minne(true)?
+	 */
+	public boolean emptyRam()
+	{
+		return (RAM[0] == 0);
 	}
 }

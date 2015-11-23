@@ -6,47 +6,35 @@ import java.util.function.Consumer;
 
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
+ *
+ * Output klasse som håndterer output fra M
+ *
+ * Default konstruksjon printer man til console
+ * Hvis man tilegner en "consumer" funskjon, sendes output dit isteden.
  */
 public class Output
 {
-	private boolean stdout;
+	private boolean stdout = true;
 	private Deque<String> outputBuffer;
-	boolean waitForNewline = false;
 
 	private Consumer<String> cons;
 
-	public Output(boolean stdout)
+	public Output()
 	{
 		outputBuffer = new ArrayDeque<>();
-		this.stdout = stdout;
 	}
 
-	public void print(String toPrint)
+	public void print(String s)
 	{
 		if (stdout) {
-			if (isWaitForNewline()) {
-				if (toPrint.equals("\n")) {
-					printAll();
-				} else {
-					outputBuffer.add(toPrint);
-				}
-			} else {
-				System.out.println(toPrint);
-			}
+			System.out.print(s);
 		} else {
-			if (toPrint != null) {
-				if (cons != null) {
-					cons.accept(toPrint);
-				} else {
-					outputBuffer.add(toPrint);
-				}
+			if (cons != null) {
+				cons.accept(s);
+			} else {
+				outputBuffer.push(s);
 			}
 		}
-	}
-
-	private void printAll()
-	{
-		System.out.println(getBuffer());
 	}
 
 	public String getBuffer()
@@ -60,12 +48,8 @@ public class Output
 
 	public void setConsumer(Consumer<String> e)
 	{
+		stdout = false;
 		this.cons = e;
-	}
-
-	public boolean isStdout()
-	{
-		return stdout;
 	}
 
 	public void setStdout(boolean stdout)
@@ -73,23 +57,4 @@ public class Output
 		this.stdout = stdout;
 	}
 
-	public Deque<String> getOutputBuffer()
-	{
-		return outputBuffer;
-	}
-
-	public void setOutputBuffer(ArrayDeque<String> outputBuffer)
-	{
-		this.outputBuffer = outputBuffer;
-	}
-
-	public boolean isWaitForNewline()
-	{
-		return waitForNewline;
-	}
-
-	public void setWaitForNewline(boolean waitForNewline)
-	{
-		this.waitForNewline = waitForNewline;
-	}
 }

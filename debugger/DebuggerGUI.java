@@ -3,9 +3,7 @@ package virtualm.debugger;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
@@ -16,6 +14,8 @@ import virtualm.logikk.Parser;
 
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
+ *
+ * Hovedklasse for debugger guiet.
  */
 public class DebuggerGUI extends Application
 {
@@ -43,13 +43,27 @@ public class DebuggerGUI extends Application
 		scene = new Scene(root, WIDTH,HEIGHT);
 
 		virtualM = new M();
-		virtualM.setConsumer(s -> {
-			statusLinje.setText(statusLinje.getText() + s);
+		virtualM.setConsumer(s -> statusLinje.setText(statusLinje.getText() + s));
+
+		virtualM.setIntSupplier(() -> {
+			while (true) {
+				Dialog<String> d = new TextInputDialog();
+				d.setContentText("Skriv inn et tall mellom 0-255");
+				String s = d.showAndWait().get();
+				try {
+					int i = Integer.parseInt(s);
+					if (i < 255) return i;
+				} catch (Exception e) {
+					printAlert(e.getMessage());
+				}
+			}
 		});
 
 		setupLayout();
 		setupButtons();
 		setupDebugPane();
+		setupKnappActions();
+
 		root.getChildren().add(bp);
 
 		primaryStage.setScene(scene);
@@ -73,21 +87,48 @@ public class DebuggerGUI extends Application
 	private void setupButtons()
 	{
 		lastTilRam = new Button("Last kode til RAM");
+		run = new Button("Kjør");
+		step = new Button("Steg");
+		exit = new Button("Reset");
+		statusLinje = new Text("ProgramOutput: ");
+		knappPane = new HBox(lastTilRam, run, step, exit, statusLinje);
+		bp.setBottom(knappPane);
+	}
+
+	private void setupKnappActions()
+	{
 		lastTilRam.setOnAction(event -> {
 			int[] programTilRam;
 			try {
-				programTilRam = Parser.kodeTilRam(codeView.getText());
+				String s = codeView.getText();
+				if (s == null || s.length() == 0) {
+					printAlert("Ingen kode skrevet inn!");
+					return;
+				}
+				programTilRam = Parser.kodeTilRam(s);
 				if (programTilRam != null) {
 					virtualM.loadIntoRam(programTilRam);
+					statusLinje.setText("Program lastet ok!");
 					debugPane.oppdater();
 				}
 			} catch (Exception e) {
 				printAlert("ERROR PARSING\n" + e.getMessage());
 			}
 		});
-		run = new Button("Kjør");
-		step = new Button("Steg");
+
+		run.setOnAction(event -> {
+			if (virtualM.emptyRam()) {
+				printAlert("Inget program lastet!");
+				return;
+			}
+			virtualM.executeProgram();
+			debugPane.oppdater();
+		});
 		step.setOnAction(event -> {
+			if (virtualM.emptyRam()) {
+				printAlert("Inget program lastet!");
+				return;
+			}
 			try {
 				virtualM.stepProgram();
 				debugPane.oppdater();
@@ -95,10 +136,12 @@ public class DebuggerGUI extends Application
 				printAlert("STEP ERROR\n" + e.getMessage());
 			}
 		});
-		exit = new Button("Avslutt");
-		statusLinje = new Text("ProgramOutput: ");
-		knappPane = new HBox(lastTilRam, run, step, exit, statusLinje);
-		bp.setBottom(knappPane);
+
+		exit.setOnAction(event -> {
+			virtualM.reset();
+			debugPane.oppdater();
+			statusLinje.setText("");
+		});
 	}
 
 	private void setupDebugPane()
@@ -109,7 +152,6 @@ public class DebuggerGUI extends Application
 
 	private void printAlert(String s)
 	{
-
 		Alert alert = new Alert(Alert.AlertType.ERROR, s);
 		alert.show();
 	}
