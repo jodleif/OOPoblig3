@@ -24,18 +24,19 @@ public class Parser
 			String[] linjeDelt = linje.split(" ");
 			// Kan være kommentarer
 			opcode op = opcode.getCode(linjeDelt[0]);
-			if (op == opcode.INVALID) throw new IllegalArgumentException("UGYLDIG OPCODE!");
+			if (op == opcode.INVALID) throw new IllegalArgumentException("UGYLDIG OPCODE: " + linjeDelt[0]);
 
 			// Legge til kode
 			liste.add(op.getVal());
+			if (op.getVal() >= 10 && op.getVal() <= 13 || op.getVal() == 50) continue; // Ingen parametere!
 
 			if (linjeDelt.length > 1) {
-				if (linjeDelt[1].charAt(0) <= '0' || linjeDelt[1].charAt(0) >= '9' ) continue;
+				//if (linjeDelt[1].charAt(0) <= '0' || linjeDelt[1].charAt(0) >= '9' ) continue;
 				try {
 					int opcode = Integer.parseInt(linjeDelt[1]);
 					liste.add(opcode);
 				} catch (Exception e) {
-					System.err.println("Feil under parsing!!!");
+					throw new IllegalArgumentException("Ugyldig adresse!\n" + e.getMessage());
 				}
 			}
 		}
