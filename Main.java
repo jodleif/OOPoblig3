@@ -1,5 +1,7 @@
 package virtualm;
 
+import virtualm.debugger.DebuggerGUI;
+
 /**
  * Created by Jo Øivind Gjernes on 12.11.2015.
  *
@@ -10,6 +12,7 @@ public class Main
 
 	public static void main(String[] args)
 	{
-		System.out.println("VirtualM");
+		DebuggerGUI gui = new DebuggerGUI();
+		gui.StartApp(args);
 	}
 }

@@ -58,4 +58,18 @@ public class M
 	}
  /* Eventuelle hjelpemetoder */
 
+	public int[] getRAM()
+	{
+		return RAM;
+	}
+
+	public int getR()
+	{
+		return R;
+	}
+
+	public int getPC()
+	{
+		return PC;
+	}
 }
