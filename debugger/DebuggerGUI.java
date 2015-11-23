@@ -8,14 +8,16 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import virtualm.debugger.Debug.DebugPane;
+import virtualm.logikk.M;
 
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
  */
 public class DebuggerGUI extends Application
 {
-	private static final double WIDTH = 1024d;
-	private static final double HEIGHT = 768d;
+	public static final double WIDTH = 1024d;
+	public static final double HEIGHT = 768d;
 	private static final String TITLE = "Virtual M debugger";
 
 	private Scene scene;
@@ -25,6 +27,7 @@ public class DebuggerGUI extends Application
 	private TextArea codeView;
 	private HBox knappPane;
 	private Button run, step, exit;
+	private DebugPane debugPane;
 
 	@Override
 	public void start(Stage primaryStage) throws Exception
@@ -34,7 +37,7 @@ public class DebuggerGUI extends Application
 
 		setupLayout();
 		setupButtons();
-
+		setupDebugPane();
 		root.getChildren().add(bp);
 
 		primaryStage.setScene(scene);
@@ -49,7 +52,7 @@ public class DebuggerGUI extends Application
 	private void setupLayout()
 	{
 		codeView = new TextArea();
-		codeView.setMinHeight(HEIGHT-150);
+		codeView.setMinHeight(HEIGHT - 100);
 		codeView.setMinWidth(WIDTH-200);
 		bp.setCenter(codeView);
 	}
@@ -61,5 +64,11 @@ public class DebuggerGUI extends Application
 		exit = new Button("Avslutt");
 		knappPane = new HBox(run,step,exit);
 		bp.setBottom(knappPane);
+	}
+
+	private void setupDebugPane()
+	{
+		debugPane = new DebugPane(new M(), HEIGHT - 100); // TODO: implementere virtualm
+		bp.setRight(debugPane);
 	}
 }

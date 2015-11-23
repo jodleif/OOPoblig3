@@ -54,6 +54,7 @@ public enum opcode
 			if(op.getString().equals(code))
 				return op;
 		}
+		if (code.equals("RSET")) return opcode.MOV; // Følge spesifikasjon
 		return opcode.INVALID;
 	}
 

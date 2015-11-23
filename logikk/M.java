@@ -17,6 +17,8 @@ public class M
 	public M()
 	{
 		RAM = new int[RAM_SIZE];
+		R = 0;
+		PC = 0;
  /* Initialisering av instansvariabler */
 	}
 
