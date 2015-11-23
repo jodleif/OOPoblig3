@@ -22,7 +22,12 @@ public class Input
 	{
 	}
 
-	public int read()
+	/**
+	 * Les inn et heltall!
+	 *
+	 * @return heltallet
+	 */
+	public int read() throws IllegalArgumentException
 	{
 		if (stdin) {
 			return readIntConsole();
@@ -30,29 +35,40 @@ public class Input
 			if (intSuppl != null) {
 				return intSuppl.getAsInt();
 			} else {
-				System.err.println("No supplier defined in input class!!! (provided input 0)");
-				return 0;
+				throw new IllegalArgumentException("Ingen supplier definert for read\n");
 			}
 		}
 	}
 
-	public int readc()
+	/**
+	 * Les inn bokstav
+	 *
+	 * @return int verdien til bokstaven
+	 */
+	public int readc() throws IllegalArgumentException
 	{
 		if (stdin) {
-			int i;
 			try {
-				System.out.println("Enter a value between 0-255");
-				i = System.in.read();
+				System.out.print("Skriv inn en bokstav + enter:");
+				return System.console().readLine().charAt(0);
 			} catch (Exception e) {
 				System.err.println("ERROR: " + e.getMessage());
-				i = 0;
+				return 0;
 			}
-			return i;
 		} else {
-			return strSupplier.get().charAt(0);
+			if (strSupplier != null) {
+				return strSupplier.get().charAt(0);
+			} else {
+				throw new IllegalArgumentException("Ingen supplier definert for readc\n");
+			}
 		}
 	}
 
+	/**
+	 * Sett begge "supplier" funksjoner. Setter begge på en gang for det gir ingen mening å bruke både console og en supplier
+	 * @param intSuppl funksjon som returnerer ett heltall
+	 * @param strSupplier funksjon som returnerer en stregn, bruker kun første bokstav i strengen!
+	 */
 	public void setSuppliers(IntSupplier intSuppl, Supplier<String> strSupplier)
 	{
 		if (intSuppl == null || strSupplier == null)
@@ -64,23 +80,13 @@ public class Input
 
 	private int readIntConsole()
 	{
-		int i = 0;
 		try {
-			int last = System.in.read() - '0';
-			while (last != 10) {
-				i += last;
-				last = System.in.read();
-				if (last == 10) continue; // 10 == '\n'
-				last -= '0';
-				if (i > 127 || i < -128) {
-					return i - last;
-				}
-			}
+			System.out.print("Skriv inn et heltall!:");
+			return Integer.parseInt(System.console().readLine());
 		} catch (Exception e) {
 			System.err.println("[readIntConsole] ERROR INPUT ONLY NUMBERS between -128,127.\nReturning 0");
 			return 0;
 		}
-		return i;
 	}
 
 }
