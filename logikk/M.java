@@ -14,7 +14,7 @@ import java.util.function.Supplier;
  *
  *
  * Minnet ser slik ut:
- * 00000000_AAAAAAAA_UUUUUUUU_BBBBBBBB
+ * RAM[ADRESSE] = 00000000_AAAAAAAA_UUUUUUUU_BBBBBBBB
  * 0 - ledig
  * A - Operasjoner "opcoder"
  * U - Ubrukt (kan egentlig bruke variabler opp til 16-bit, men er etpar sjekker inne i programmet som stopper det fra å fungere)

@@ -47,15 +47,16 @@ public class DebugPane extends Pane
 		register = new Text();
 		programTeller = new Text();
 		tableView = new TableView<>();
+
 		tableView.setPrefHeight(DebuggerGUI.HEIGHT);
 		tableView.setMaxHeight(height - programTeller.getY() * 2);
 		tableView.setPrefWidth(350);
 		tableView.setMaxWidth(350);
+
 		indexCol = new TableColumn<>("adr");
 		opcodeCol = new TableColumn<>("opcode");
 		memCol = new TableColumn<>("minne");
 		memColFull = new TableColumn<>("minne-fullt");
-
 
 		kopleOppMotMinne();
 		byggOppColumns();
@@ -73,6 +74,7 @@ public class DebugPane extends Pane
 			register.setText(registerString + String.valueOf(virtualm.getR()));
 			programTeller.setText(programTellerString + String.valueOf(virtualm.getPC()));
 			minneMapping.forEach(e -> e.update());
+			tableView.getSelectionModel().select(virtualm.getPC()); // Markere gjeldene rad! under step run
 		}
 	}
 
