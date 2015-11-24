@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
 
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
@@ -12,6 +13,13 @@ import java.nio.file.Paths;
  */
 public class FilIO
 {
+
+	/**
+	 * Last inn en tekstfil som en lang String
+	 *
+	 * @param filnavn filnavnet
+	 * @return en string som inneholder hele fila
+	 */
 	public static String lesFil(String filnavn)
 	{
 		StringBuilder res = new StringBuilder();
@@ -27,6 +35,12 @@ public class FilIO
 		return res.toString();
 	}
 
+	/**
+	 * Les "råe" bytes fra fil. Ikke brukt sålangt
+	 *
+	 * @param filnavn filnavnet å lese
+	 * @return tabell med alle bytes i fila
+	 */
 	public static byte[] lesByteFil(String filnavn)
 	{
 		Path path = Paths.get(filnavn);
@@ -36,5 +50,44 @@ public class FilIO
 			System.err.println("[lesByteFil] Feil under lesing av fil\n" + e.getMessage());
 		}
 		return null;
+	}
+
+	/**
+	 * Lese en ascii fil som er kodet med tall/maskinkoder
+	 *
+	 * @param filnavn filen du vil åpne
+	 * @return tabell med tall - må oversettes til "register språk"
+	 */
+	public static int[] lesTekstFilMedBytes(String filnavn)
+	{
+		String str = lesFil(filnavn);
+		return tallStrengTilTabell(str);
+	}
+
+	/**
+	 * Strengt tatt ikke "FilIO" spesifikk - men kjekt å trekke ut
+	 * funskjonalitet så mye som mulig.
+	 *
+	 * @param tallStreng streng fylt med tallverdier for operasjoner
+	 * @return tabell med alle tallverdiene "skilt" ut fra strengen
+	 */
+	public static int[] tallStrengTilTabell(String tallStreng)
+	{
+		int[] arr = new int[tallStreng.length()];
+		Scanner scan = new Scanner(tallStreng);
+
+		int teller = 0;
+		while (scan.hasNext()) {
+			if (scan.hasNextInt(10)) {
+				int intInput = scan.nextInt(10);
+				arr[teller++] = intInput;
+			} else {
+				scan.next();
+			}
+		}
+
+		int[] result = new int[teller];
+		System.arraycopy(arr, 0, result, 0, teller);
+		return result;
 	}
 }

@@ -10,11 +10,9 @@ import virtualm.logikk.M;
  *
  * BRUK:
  *
- * Kjøre program i console:
- * java virtualm.Main kodefil.txt
+ * Kjøre program i console: java virtualm.Main kodefil.txt
  *
- * Starte GUI:
- * java virtualm.Main
+ * Starte GUI: java virtualm.Main
  *
  */
 public class Main
@@ -22,12 +20,12 @@ public class Main
 
 	public static void main(String[] args)
 	{
- /*
- * Hent filnavn fra kommandolinje (args[0])
- * Lag et M-objekt
- * Last program fra fil (loadProgram)
- * Utfør programmet (executeProgram)
-	*/
+		/*
+		 * Hent filnavn fra kommandolinje (args[0])
+		 * Lag et M-objekt
+		 * Last program fra fil (loadProgram)
+		 * Utfør programmet (executeProgram)
+		 */
 		if (args.length == 0) {
 			DebuggerGUI gui = new DebuggerGUI();
 			gui.StartApp(args);

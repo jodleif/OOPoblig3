@@ -18,6 +18,7 @@ import virtualm.logikk.M;
  */
 public class DebugPane extends Pane
 {
+
 	private M virtualm;
 	private VBox debugInfo;
 
@@ -69,7 +70,8 @@ public class DebugPane extends Pane
 	}
 
 	/**
-	 * Oppdaterer tabeller og felter med informasjon fra den "virtuelle maskinen" virtualm
+	 * Oppdaterer tabeller og felter med informasjon fra den "virtuelle
+	 * maskinen" virtualm
 	 */
 	public void oppdater()
 	{
@@ -121,6 +123,7 @@ public class DebugPane extends Pane
 
 	/**
 	 * Endre hvilket format "minne-fullt" skal vises i.
+	 *
 	 * @param rep binært, desimalt, heksadesimalt
 	 */
 	private void setMinneRep(MinneRepresentasjon rep)

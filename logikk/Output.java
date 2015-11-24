@@ -9,11 +9,12 @@ import java.util.function.Consumer;
  *
  * Output klasse som håndterer output fra M
  *
- * Default konstruksjon printer man til console
- * Hvis man tilegner en "consumer" funskjon, sendes output dit isteden.
+ * Default konstruksjon printer man til console Hvis man tilegner en "consumer"
+ * funskjon, sendes output dit isteden.
  */
 class Output
 {
+
 	private boolean stdout = true;
 	private Deque<String> outputBuffer;
 

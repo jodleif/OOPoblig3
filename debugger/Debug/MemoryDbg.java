@@ -12,6 +12,7 @@ import virtualm.logikk.opcode;
  */
 public class MemoryDbg
 {
+
 	private final int index;
 	private final SimpleStringProperty indexString;
 	private SimpleStringProperty opcodeParam;
@@ -91,6 +92,5 @@ public class MemoryDbg
 	{
 		this.minneRep = rep;
 	}
-
 
 }

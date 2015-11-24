@@ -7,6 +7,7 @@ package virtualm.debugger.Debug;
  */
 public enum MinneRepresentasjon
 {
+
 	BINÆRT,
 	HEKSADESIMALT,
 	DESIMAL

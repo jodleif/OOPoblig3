@@ -1,6 +1,5 @@
 package virtualm.debugger;
 
-
 import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -14,12 +13,13 @@ import java.io.IOException;
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
  * <p>
- * Meny - valgte å lage en egen "klasse" fordi:
- * 1. Prøve ut hvordan det funker å extende et vanlig menyobjekt
- * 2. Unngå at "DebuggerGUI" fila blir enda mer rotete
+ * Meny - valgte å lage en egen "klasse" fordi: 1. Prøve ut hvordan det funker å
+ * extende et vanlig menyobjekt 2. Unngå at "DebuggerGUI" fila blir enda mer
+ * rotete
  */
 class Meny extends MenuBar
 {
+
 	private Menu menuFil;
 	private Menu menuInstillinger;
 	private Menu menuHelp;
@@ -79,6 +79,7 @@ class Meny extends MenuBar
 
 	/**
 	 * Velg fil til å åpne dialog
+	 *
 	 * @param e for å passe inn i "setOnAction"
 	 */
 	private void velgFil(ActionEvent e)
@@ -97,7 +98,9 @@ class Meny extends MenuBar
 
 	/**
 	 * Avslutt programmet!
-	 * @param actionEvent ubrukt paramteter for å passe til en onactionevent metode
+	 *
+	 * @param actionEvent ubrukt paramteter for å passe til en onactionevent
+	 * metode
 	 */
 	private static void quit(ActionEvent actionEvent)
 	{
@@ -106,6 +109,7 @@ class Meny extends MenuBar
 
 	/**
 	 * Nullstill tekst i kodevinduet
+	 *
 	 * @param e ubrukt parameter for å "passe" til en OnActionEvent metode
 	 */
 	private void fjernTekst(ActionEvent e)
@@ -113,4 +117,3 @@ class Meny extends MenuBar
 		parent.settCodeViewTekst("");
 	}
 }
-

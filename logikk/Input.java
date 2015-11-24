@@ -8,11 +8,12 @@ import java.util.function.Supplier;
  * <p>
  * Klasse som håndterer input for M
  * <p>
- * Default konstruksjon henter den input fra console
- * hvis du tilegner den en "supplier" funksjon vil den hente verdier fra denne funksjonen!
+ * Default konstruksjon henter den input fra console hvis du tilegner den en
+ * "supplier" funksjon vil den hente verdier fra denne funksjonen!
  */
 class Input
 {
+
 	private boolean stdin = true;
 
 	private IntSupplier intSuppl;
@@ -65,14 +66,18 @@ class Input
 	}
 
 	/**
-	 * Sett begge "supplier" funksjoner. Setter begge på en gang for det gir ingen mening å bruke både console og en supplier
+	 * Sett begge "supplier" funksjoner. Setter begge på en gang for det gir
+	 * ingen mening å bruke både console og en supplier
+	 *
 	 * @param intSuppl funksjon som returnerer ett heltall
-	 * @param strSupplier funksjon som returnerer en stregn, bruker kun første bokstav i strengen!
+	 * @param strSupplier funksjon som returnerer en stregn, bruker kun
+	 * første bokstav i strengen!
 	 */
 	public void setSuppliers(IntSupplier intSuppl, Supplier<String> strSupplier)
 	{
-		if (intSuppl == null || strSupplier == null)
+		if (intSuppl == null || strSupplier == null) {
 			throw new IllegalArgumentException("Du må sette både intsuppl og strsupplier!");
+		}
 		stdin = false;
 		this.intSuppl = intSuppl;
 		this.strSupplier = strSupplier;

@@ -11,26 +11,24 @@ import java.util.function.Supplier;
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
  * <p>
- * Selve den virtuelle maskinen. Tolker 32bits heltall der første 16bits er satt av til instruksjonen og
- * siste 16bits er satt av til verdier eller adresser.
+ * Selve den virtuelle maskinen. Tolker 32bits heltall der første 16bits er satt
+ * av til instruksjonen og siste 16bits er satt av til verdier eller adresser.
  * Foreløpig brukes kun bit 0-7 og bit 16-23
  * <p>
- * Minnet ser slik ut:
- * RAM[ADRESSE] = 00000000_AAAAAAAA_UUUUUUUU_BBBBBBBB
- * 0 - ledig
- * A - Operasjoner "opcoder"
- * U - Ubrukt (kan egentlig bruke variabler opp til 16-bit, men er etpar sjekker inne i programmet som stopper det fra å fungere)
- * B - Adresse, verdi eller tomt
+ * Minnet ser slik ut: RAM[ADRESSE] = 00000000_AAAAAAAA_UUUUUUUU_BBBBBBBB 0 -
+ * ledig A - Operasjoner "opcoder" U - Ubrukt (kan egentlig bruke variabler opp
+ * til 16-bit, men er etpar sjekker inne i programmet som stopper det fra å
+ * fungere) B - Adresse, verdi eller tomt
  */
 public class M
 {
+
 	public final static int RAM_SIZE = 256;
 
 	public final static int FLAGS = 0b01111111_00000000_00000000_00000000; // Eventuelle FLAGG
 	public final static int UPPERMID8 = 0b00000000_11111111_00000000_00000000; // Brukes for å velge verdien i "instruksjons" området
 	public final static int LOWER16 = 0b00000000_00000000_11111111_11111111; // Brukes for å velge de laveste 16 bits
 	public final static int LOWER8 = 0b00000000_00000000_00000000_11111111; // Brukes for å velge de laveste 8 bits
-
 
 	private int[] RAM; // Eller holder det med en byte-array?
 	private int R; // Register
@@ -46,7 +44,7 @@ public class M
 		RAM = new int[RAM_SIZE];
 		R = 0;
 		PC = 0;
- /* Initialisering av instansvariabler */
+		/* Initialisering av instansvariabler */
 	}
 
 	public void loadProgram(String filsti)
@@ -58,10 +56,10 @@ public class M
 
 	public boolean stepProgram() throws IllegalArgumentException
 	{
- /*
- * Les neste instruksjon fra RAM
- * Utfør instruksjonen (og oppdater programtelleren)
- */
+		/*
+		 * Les neste instruksjon fra RAM
+		 * Utfør instruksjonen (og oppdater programtelleren)
+		 */
 		opcode curr_op = opcode.getCode((RAM[PC] & UPPERMID8) >> 16);
 		int adr = RAM[PC] & LOWER16;
 		byte r = (byte) R;
@@ -125,14 +123,17 @@ public class M
 
 				default:
 					String errorMsg = "";
-					if (curr_op.getVal() == 0)
+					if (curr_op.getVal() == 0) {
 						errorMsg += "[TIPS] Har du husket å avslutte programmet med STOP?\n";
+					}
 					errorMsg += "[stepProgram] Ugyldig opcode!\nPC=" + PC + " OPCODE " + (curr_op);
 					throw new IllegalArgumentException(errorMsg);
 			}
 		} catch (Exception e) {
 			//String feilMelding = ArrayIndexOutOfBoundsException.getMessage();
-			if (e instanceof IllegalArgumentException) throw e;
+			if (e instanceof IllegalArgumentException) {
+				throw e;
+			}
 			String feilMelding = "UTENFOR ADRESSEOMRÅDET!\nPC=" + PC + " current op: " + curr_op + " adresse / variabel" + adr;
 			throw new IllegalArgumentException(feilMelding);
 		}
@@ -142,17 +143,16 @@ public class M
 
 	public void executeProgram()
 	{
- /*
- * Så lenge programmet ikke er avsluttet
- * Utfør neste instruksjon (stepProgram)
- * Vis avsluttende melding
- */
+		/*
+		 * Så lenge programmet ikke er avsluttet
+		 * Utfør neste instruksjon (stepProgram)
+		 * Vis avsluttende melding
+		 */
 		while (!stepProgram()) ; // Kjør til programmet er ferdig(returnerer true)
 	}
 
 
- /* Eventuelle hjelpemetoder */
-
+	/* Eventuelle hjelpemetoder */
 	public int[] getRAM()
 	{
 		return RAM;
@@ -170,7 +170,9 @@ public class M
 
 	public boolean loadIntoRam(int[] program)
 	{
-		if (program.length > RAM_SIZE) return false;
+		if (program.length > RAM_SIZE) {
+			return false;
+		}
 		reset();
 		System.arraycopy(program, 0, RAM, 0, program.length);
 		return true;
@@ -200,7 +202,8 @@ public class M
 	}
 
 	/**
-	 * Funksjon som sjekker om minnet er tomt. Antar at minnet er tomt dersom første celle er lik 0
+	 * Funksjon som sjekker om minnet er tomt. Antar at minnet er tomt
+	 * dersom første celle er lik 0
 	 *
 	 * @return tomt minne(true)?
 	 */

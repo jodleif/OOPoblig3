@@ -6,9 +6,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import virtualm.debugger.Debug.DebugPane;
+import virtualm.fileio.FilIO;
 import virtualm.logikk.M;
 import virtualm.logikk.Parser.Parser;
 
@@ -19,6 +21,7 @@ import virtualm.logikk.Parser.Parser;
  */
 public class DebuggerGUI extends Application
 {
+
 	public static final double WIDTH = 1200d;
 	public static final double HEIGHT = 1000d;
 	private static final String TITLE = "Virtual M debugger";
@@ -35,14 +38,17 @@ public class DebuggerGUI extends Application
 	private Button lastTilRam, run, step, exit;
 	private DebugPane debugPane;
 
-	private Meny menyBar;
+	private ToggleGroup asmValg;
+	private RadioButton velgAsm;
+	private RadioButton velgTallkode;
 
+	private Meny menyBar;
 
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
 		primaryStage.setTitle(TITLE);
-		scene = new Scene(root, WIDTH,HEIGHT);
+		scene = new Scene(root, WIDTH, HEIGHT);
 
 		virtualM = new M();
 		virtualM.setConsumer(s -> statusLinje.setText(statusLinje.getText() + s));
@@ -79,7 +85,6 @@ public class DebuggerGUI extends Application
 		bp.setCenter(codeView);
 	}
 
-
 	/**
 	 * Oppretter knapper
 	 */
@@ -90,8 +95,18 @@ public class DebuggerGUI extends Application
 		step = new Button("Steg");
 		exit = new Button("Reset");
 		statusLinje = new Text("ProgramOutput: ");
-		knappPane = new HBox(lastTilRam, run, step, exit, statusLinje);
-		bp.setBottom(knappPane);
+
+		velgAsm = new RadioButton("Assembler");
+		velgTallkode = new RadioButton("Tallkoder");
+		asmValg = new ToggleGroup();
+		velgAsm.setToggleGroup(asmValg);
+		velgTallkode.setToggleGroup(asmValg);
+		asmValg.selectToggle(velgAsm);
+		knappPane = new HBox(lastTilRam, run, step, exit);
+		HBox underKnappPane = new HBox(velgAsm, velgTallkode);
+		VBox tmpBox = new VBox(knappPane, underKnappPane);
+		HBox hBoxBunn = new HBox(tmpBox, statusLinje);
+		bp.setBottom(hBoxBunn);
 	}
 
 	/**
@@ -154,7 +169,11 @@ public class DebuggerGUI extends Application
 				printAlert("Ingen kode skrevet inn!");
 				return;
 			}
+			if (velgAsm.isSelected()) {
 			programTilRam = Parser.assembler(s);
+			} else {
+				programTilRam = Parser.simpleParser(FilIO.tallStrengTilTabell(s));
+			}
 			if (programTilRam != null) {
 				virtualM.loadIntoRam(programTilRam);
 				statusLinje.setText("Program lastet ok!");
@@ -166,7 +185,9 @@ public class DebuggerGUI extends Application
 	}
 
 	/**
-	 * Spesifisere tekst i Kodevinduet (brukes foreløpig kun for å nullstille teksten
+	 * Spesifisere tekst i Kodevinduet (brukes foreløpig kun for å
+	 * nullstille teksten
+	 *
 	 * @param tekst tekst
 	 */
 	void settCodeViewTekst(String tekst)
@@ -175,8 +196,10 @@ public class DebuggerGUI extends Application
 	}
 
 	/**
-	 * Funksjon for å "hente" bokstav fra brukeren (trengs for instruksjonen cread)
-	 * Returnerer en streng (garantert lengre enn 0) Kun den første bokstaven i strengen brukes i implementasjonen
+	 * Funksjon for å "hente" bokstav fra brukeren (trengs for instruksjonen
+	 * cread) Returnerer en streng (garantert lengre enn 0) Kun den første
+	 * bokstaven i strengen brukes i implementasjonen
+	 *
 	 * @return String med inputen i dialogboksen.
 	 */
 	private static String hentBokstav()
@@ -185,12 +208,15 @@ public class DebuggerGUI extends Application
 			Dialog<String> d = new TextInputDialog();
 			d.setContentText("Skriv inn et tegn(Hvis du skriver flere tegn sendes kun det første");
 			String s = d.showAndWait().get();
-			if (s.length() >= 0) return s;
+			if (s.length() >= 0) {
+				return s;
+			}
 		}
 	}
 
 	/**
 	 * Lik hentbokstav, men denne henter et heltall. (brukes for IREAD)
+	 *
 	 * @return heltall
 	 */
 	private static int hentHeltall()
@@ -201,7 +227,9 @@ public class DebuggerGUI extends Application
 			String s = d.showAndWait().get();
 			try {
 				int i = Integer.parseInt(s);
-				if (i < 255) return i;
+				if (i < 255) {
+					return i;
+				}
 			} catch (Exception e) {
 				printAlert(e.getMessage());
 			}
@@ -210,6 +238,7 @@ public class DebuggerGUI extends Application
 
 	/**
 	 * Vis feilmelding
+	 *
 	 * @param s tekst i feilmelding
 	 */
 	public static void printAlert(String s)
@@ -220,7 +249,8 @@ public class DebuggerGUI extends Application
 	}
 
 	/**
-	 * Aksessmeny for å sette hvilken minnereperesentasjon minne-full skal vise
+	 * Aksessmeny for å sette hvilken minnereperesentasjon minne-full skal
+	 * vise
 	 */
 	public void velgMinneRep()
 	{
