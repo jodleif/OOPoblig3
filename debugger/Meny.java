@@ -21,22 +21,28 @@ import java.io.IOException;
 public class Meny extends MenuBar
 {
 	private Menu menuFil;
+	private Menu menuInstillinger;
 	private Menu menuHelp;
+
 
 	private FileChooser filÅpner;
 
 	private MenuItem lastFil;
 	private MenuItem fjernTekst;
 	private MenuItem avslutt;
+
+	private MenuItem minneRep;
 	private DebuggerGUI parent;
 
 	public Meny(DebuggerGUI parent) throws IOException
 	{
 		this.parent = parent;
 		menuFil = new Menu("Fil");
+		menuInstillinger = new Menu("Innstillinger");
 		menuHelp = new Menu("Hjelp");
+
 		setupFileChooser();
-		this.getMenus().addAll(menuFil, menuHelp);
+		this.getMenus().addAll(menuFil, menuInstillinger, menuHelp);
 		initMenyer();
 	}
 
@@ -45,10 +51,15 @@ public class Meny extends MenuBar
 		lastFil = new MenuItem("Last fil");
 		fjernTekst = new MenuItem("Fjern tekst");
 		avslutt = new MenuItem("Avslutt!");
+		minneRep = new MenuItem("Velg minnereperesentasjon");
+
 		avslutt.setOnAction(Meny::quit);
 		lastFil.setOnAction(this::velgFil);
 		fjernTekst.setOnAction(this::fjernTekst);
+		minneRep.setOnAction(parent::velgMinneRep);
+
 		menuFil.getItems().addAll(lastFil, fjernTekst, avslutt);
+		menuInstillinger.getItems().add(minneRep);
 	}
 
 	private void setupFileChooser() throws IOException

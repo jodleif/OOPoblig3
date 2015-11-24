@@ -11,14 +11,25 @@ import java.util.function.Supplier;
  * Created by Jo Øivind Gjernes on 23.11.2015.
  * <p>
  * Sup
+ *
+ *
+ * Minnet ser slik ut:
+ * 00000000_AAAAAAAA_UUUUUUUU_BBBBBBBB
+ * 0 - ledig
+ * A - Operasjoner "opcoder"
+ * U - Ubrukt (kan egentlig bruke variabler opp til 16-bit, men er etpar sjekker inne i programmet som stopper det fra å fungere)
+ * B - Adresse, verdi eller tomt
  */
 public class M
 {
 	public final static int RAM_SIZE = 256;
+
 	public final static int FLAGS = 0b01111111_00000000_00000000_00000000; // Eventuelle FLAGG
 	public final static int UPPERMID8 = 0b00000000_11111111_00000000_00000000; // Unngå negative tall
 	public final static int LOWER16 = 0b00000000_00000000_11111111_11111111;
 	public final static int VARFLAG = 0b00000001_00000000_00000000_00000000; // Tester å markere ting som variabler i minnet
+
+
 	private int[] RAM; // Eller holder det med en byte-array?
 	private int minneområde;
 	private int R; // Register
@@ -71,7 +82,7 @@ public class M
 				R = RAM[oversatt] & LOWER16;
 				break;
 			case STORE:
-				RAM[oversatt] = (R & LOWER16) + VARFLAG;
+				RAM[oversatt] = R & LOWER16;
 				break;
 			case MOV:
 				R = adr;

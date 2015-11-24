@@ -23,7 +23,7 @@ public enum opcode
 	JZERO (42, "JZERO"),
 	STOP (50, "STOP"), // Ingen param
 	INVALID(-1, "INVALID"),
-	VAR(M.VARFLAG, "VAR"),
+	//VAR(M.VARFLAG, "VAR"),
 	EMPTY(0, " ");
 
 

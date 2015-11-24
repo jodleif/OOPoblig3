@@ -15,8 +15,10 @@ public class MemoryDbg
 	private final int index;
 	private final SimpleStringProperty indexString;
 	private SimpleStringProperty opcodeParam;
+	private SimpleStringProperty memParamFull; // Hele minnet på adressen
 	private ReadOnlyObjectWrapper<Integer> memParam;
 	private int[] RAM;
+	private MinneRepresentasjon minneRep;
 
 	public MemoryDbg(int index, int[] RAM)
 	{
@@ -24,7 +26,9 @@ public class MemoryDbg
 		this.RAM = RAM;
 		indexString = new SimpleStringProperty(index + ": ");
 		opcodeParam = new SimpleStringProperty();
+		memParamFull = new SimpleStringProperty();
 		memParam = new ReadOnlyObjectWrapper<>();
+		minneRep = MinneRepresentasjon.BINÆRT;
 		update();
 	}
 
@@ -37,13 +41,8 @@ public class MemoryDbg
 	{
 		int op = (RAM[index] & M.UPPERMID8) >> 16;
 		opcode op1 = opcode.getCode(op);
-		if (op1 == opcode.EMPTY && RAM[index] != 0) {
-			opcode op2 = opcode.getCode(RAM[index] & M.FLAGS);
-			if (op2 != opcode.INVALID)
-				op1 = op2;
-		}
 
-		return op1.getString() + " (" + op + ")";
+		return (op1 != null) ? op1.getString() : "" + " (" + op + ")";
 	}
 
 	public SimpleStringProperty getOpcodeParam()
@@ -56,6 +55,10 @@ public class MemoryDbg
 		return memParam;
 	}
 
+	public SimpleStringProperty getMemParamFull()
+	{
+		return memParamFull;
+	}
 	public Integer getMem()
 	{
 		return RAM[index] & M.LOWER16;
@@ -65,5 +68,28 @@ public class MemoryDbg
 	{
 		opcodeParam.set(getOpcode());
 		memParam.set(getMem());
+		switch (minneRep) {
+
+			case BINÆRT:
+				memParamFull.set(Integer.toBinaryString(RAM[index]));
+				while (memParamFull.getValue().length() != 24) {
+					memParamFull.setValue("0" + memParamFull.getValue());
+				}
+				break;
+			case HEKSADESIMALT:
+				memParamFull.set(Integer.toHexString(RAM[index]));
+				break;
+			case DESIMAL:
+				memParamFull.set(Integer.toString(RAM[index]));
+				break;
+		}
+
 	}
+
+	public void setMinneRep(MinneRepresentasjon rep)
+	{
+		this.minneRep = rep;
+	}
+
+
 }

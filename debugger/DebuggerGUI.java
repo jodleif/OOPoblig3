@@ -1,6 +1,7 @@
 package virtualm.debugger;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -47,7 +48,7 @@ public class DebuggerGUI extends Application
 		virtualM = new M();
 		virtualM.setConsumer(s -> statusLinje.setText(statusLinje.getText() + s));
 
-		virtualM.setSupplier(this::hentHeltall, this::hentBokstav); // Metode referanse!!!
+		virtualM.setSupplier(DebuggerGUI::hentHeltall, DebuggerGUI::hentBokstav); // Metode referanse!!!
 		menyBar = new Meny(this);
 		setupLayout();
 		setupButtons();
@@ -68,7 +69,7 @@ public class DebuggerGUI extends Application
 	{
 		codeView = new TextArea();
 		codeView.setMinHeight(HEIGHT - 100);
-		codeView.setMinWidth(WIDTH-200);
+		codeView.setMinWidth(WIDTH - 350);
 		bp.setCenter(codeView);
 	}
 
@@ -122,12 +123,6 @@ public class DebuggerGUI extends Application
 		bp.setRight(debugPane);
 	}
 
-	private void printAlert(String s)
-	{
-		Alert alert = new Alert(Alert.AlertType.ERROR, s);
-		alert.show();
-	}
-
 	private void lastTekstTilRam()
 	{
 		int[] programTilRam;
@@ -148,7 +143,12 @@ public class DebuggerGUI extends Application
 		}
 	}
 
-	private String hentBokstav()
+	void settCodeViewTekst(String tekst)
+	{
+		this.codeView.setText(tekst);
+	}
+
+	private static String hentBokstav()
 	{
 		while (true) {
 			Dialog<String> d = new TextInputDialog();
@@ -158,7 +158,7 @@ public class DebuggerGUI extends Application
 		}
 	}
 
-	private int hentHeltall()
+	private static int hentHeltall()
 	{
 		while (true) {
 			Dialog<String> d = new TextInputDialog();
@@ -173,8 +173,14 @@ public class DebuggerGUI extends Application
 		}
 	}
 
-	void settCodeViewTekst(String tekst)
+	private static void printAlert(String s)
 	{
-		this.codeView.setText(tekst);
+		Alert alert = new Alert(Alert.AlertType.ERROR, s);
+		alert.show();
+	}
+
+	public void velgMinneRep(ActionEvent e)
+	{
+		debugPane.velgMinneRepDialog();
 	}
 }
