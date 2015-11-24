@@ -22,7 +22,10 @@ public enum opcode
 	JNEG (41, "JNEG"),
 	JZERO (42, "JZERO"),
 	STOP (50, "STOP"), // Ingen param
-	INVALID(-1, "INVALID");
+	INVALID(-1, "INVALID"),
+	VAR(M.VARFLAG, "VAR"),
+	EMPTY(0, " ");
+
 
 	private int val;
 	private String valS;
@@ -58,6 +61,12 @@ public enum opcode
 		}
 		if (code.equals("RSET")) return opcode.MOV; // Følge spesifikasjon
 		return opcode.INVALID;
+	}
+
+	@Override
+	public String toString()
+	{
+		return valS;
 	}
 
 }

@@ -2,6 +2,7 @@ package virtualm.logikk;
 
 import virtualm.fileio.FilIO;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -12,9 +13,12 @@ import java.util.function.Supplier;
  * Sup
  */
 public class M
-
 {
-	private final static int RAM_SIZE = 256;
+	public final static int RAM_SIZE = 256;
+	public final static int FLAGS = 0b01111111_00000000_00000000_00000000; // Eventuelle FLAGG
+	public final static int UPPERMID8 = 0b00000000_11111111_00000000_00000000; // Unngå negative tall
+	public final static int LOWER16 = 0b00000000_00000000_11111111_11111111;
+	public final static int VARFLAG = 0b00000001_00000000_00000000_00000000; // Tester å markere ting som variabler i minnet
 	private int[] RAM; // Eller holder det med en byte-array?
 	private int minneområde;
 	private int R; // Register
@@ -47,8 +51,9 @@ public class M
  * Les neste instruksjon fra RAM
  * Utfør instruksjonen (og oppdater programtelleren)
  */
-		opcode curr_op = opcode.getCode(RAM[PC]);
-		int adr;
+		opcode curr_op = opcode.getCode((RAM[PC] & UPPERMID8) >> 16);
+		int adr = RAM[PC] & LOWER16;
+		int oversatt = oversettAdresse(adr);
 		switch (curr_op) {
 			case IREAD:
 				R = input.read();
@@ -63,62 +68,47 @@ public class M
 				output.print(String.valueOf((char) R));
 				break;
 			case LOAD:
-				++PC;
-				adr = oversettAdresse(RAM[PC]);
-				R = RAM[adr];
+				R = RAM[oversatt] & LOWER16;
 				break;
 			case STORE:
-				++PC;
-				adr = oversettAdresse(RAM[PC]);
-				RAM[adr] = R;
+				RAM[oversatt] = (R & LOWER16) + VARFLAG;
 				break;
 			case MOV:
-				++PC;
-				R = RAM[PC];
+				R = adr;
 				break;
 			case ADD:
-				++PC;
-				adr = oversettAdresse(RAM[PC]);
-				R += RAM[adr];
+				R += RAM[oversatt];
 				break;
 			case SUB:
-				++PC;
-				adr = oversettAdresse(RAM[PC]);
-				R -= RAM[adr];
+				R -= RAM[oversatt];
 				break;
 			case MULT:
-				++PC;
-				adr = oversettAdresse(RAM[PC]);
-				R *= RAM[adr];
+				R *= RAM[oversatt];
 				break;
 			case DIV:
-				++PC;
-				adr = oversettAdresse(RAM[PC]);
-				R /= RAM[adr];
+				R /= RAM[oversatt];
 				break;
 			case JUMP:
-				++PC;
-				PC = RAM[PC];
+				PC = adr;
 				return false; // Unngå ++PC;
 			case JNEG:
-				++PC;
 				if (R < 0) {
-					PC = RAM[PC];
+					PC = adr;
 					return false; // Ikke inkrementere PC!!
 				}
 				break;
 			case JZERO:
-				++PC;
-				if (PC == 0) {
-					PC = RAM[PC];
+				if (R == 0) {
+					PC = adr;
 					return false; // Ikke inkrementere PC!!
 				}
 				break;
 			case STOP:
 				stop();
 				return true;
-			case INVALID:
-				throw new IllegalArgumentException("[stepProgram] Ugyldig opcode!\nPC=" + PC);
+
+			default:
+				throw new IllegalArgumentException("[stepProgram] Ugyldig opcode!\nPC=" + PC + " OPCODE " + (RAM[PC] & UPPERMID8));
 		}
 		++PC; // Inkrementer programtelleren
 		return false;
@@ -188,7 +178,7 @@ public class M
 		minneområde = 0;
 		PC = 0;
 		R = 0;
-		RAM = new int[RAM_SIZE]; // RESET RAM
+		Arrays.fill(RAM, 0);
 	}
 
 	/**

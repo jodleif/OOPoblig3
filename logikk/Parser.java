@@ -19,7 +19,7 @@ public class Parser
 		String[] strings = kode.split("\n");
 		ArrayList<Integer> liste = new ArrayList<>();
 
-		if (strings == null || strings.length == 0) throw new IllegalArgumentException("Tom kode!");
+		if (strings.length == 0) throw new IllegalArgumentException("Tom kode!");
 		for (String linje : strings) {
 			String[] linjeDelt = linje.split(" ");
 			// Kan være kommentarer
@@ -27,18 +27,18 @@ public class Parser
 			if (op == opcode.INVALID) throw new IllegalArgumentException("UGYLDIG OPCODE: " + linjeDelt[0]);
 
 			// Legge til kode
-			liste.add(op.getVal());
-			if (op.getVal() >= 10 && op.getVal() <= 13 || op.getVal() == 50) continue; // Ingen parametere!
+			Integer i = (op.getVal() << 16);
 
 			if (linjeDelt.length > 1) {
 				//if (linjeDelt[1].charAt(0) <= '0' || linjeDelt[1].charAt(0) >= '9' ) continue;
 				try {
 					int opcode = Integer.parseInt(linjeDelt[1]);
-					liste.add(opcode);
+					i += opcode;
 				} catch (Exception e) {
 					throw new IllegalArgumentException("Ugyldig adresse!\n" + e.getMessage());
 				}
 			}
+			liste.add(i);
 		}
 		return arrayListToInt(liste);
 	}
