@@ -1,6 +1,7 @@
 package virtualm.logikk;
 
 import virtualm.fileio.FilIO;
+import virtualm.logikk.Parser.Parser;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -11,8 +12,8 @@ import java.util.function.Supplier;
  * Created by Jo Øivind Gjernes on 23.11.2015.
  * <p>
  * Sup
- *
- *
+ * <p>
+ * <p>
  * Minnet ser slik ut:
  * RAM[ADRESSE] = 00000000_AAAAAAAA_UUUUUUUU_BBBBBBBB
  * 0 - ledig
@@ -27,7 +28,8 @@ public class M
 	public final static int FLAGS = 0b01111111_00000000_00000000_00000000; // Eventuelle FLAGG
 	public final static int UPPERMID8 = 0b00000000_11111111_00000000_00000000; // Unngå negative tall
 	public final static int LOWER16 = 0b00000000_00000000_11111111_11111111;
-	//public final static int VARFLAG = 0b00000001_00000000_00000000_00000000; d/ Tester å markere ting som variabler i minnet
+	public final static int LOWER8 = 0b00000000_00000000_00000000_11111111;
+	//public final static int NEGFLAG = 0b00000001_00000000_00000000_00000000; // Tester å markere ting som variabler i minnet
 
 
 	private int[] RAM; // Eller holder det med en byte-array?
@@ -64,62 +66,77 @@ public class M
  */
 		opcode curr_op = opcode.getCode((RAM[PC] & UPPERMID8) >> 16);
 		int adr = RAM[PC] & LOWER16;
-		int oversatt = oversettAdresse(adr);
-		switch (curr_op) {
-			case IREAD:
-				R = input.read();
-				break;
-			case IWRITE:
-				output.print(String.valueOf(R) + "\n");
-				break;
-			case CREAD:
-				R = input.readc();
-				break;
-			case CWRITE:
-				output.print(String.valueOf((char) R));
-				break;
-			case LOAD:
-				R = RAM[oversatt] & LOWER16;
-				break;
-			case STORE:
-				RAM[oversatt] = R & LOWER16;
-				break;
-			case MOV:
-				R = adr;
-				break;
-			case ADD:
-				R += RAM[oversatt];
-				break;
-			case SUB:
-				R -= RAM[oversatt];
-				break;
-			case MULT:
-				R *= RAM[oversatt];
-				break;
-			case DIV:
-				R /= RAM[oversatt];
-				break;
-			case JUMP:
-				PC = adr;
-				return false; // Unngå ++PC;
-			case JNEG:
-				if (R < 0) {
+		byte r = (byte) R;
+		try {
+			switch (curr_op) {
+				case IREAD:
+					R = input.read();
+					break;
+				case IWRITE:
+					output.print(String.valueOf((byte) (R & LOWER8)));
+					break;
+				case CREAD:
+					R = input.readc();
+					break;
+				case CWRITE:
+					output.print(String.valueOf((char) R));
+					break;
+				case LOAD:
+					R = RAM[adr] & LOWER8;
+					break;
+				case STORE:
+					RAM[adr] = R & LOWER8;
+					break;
+				case MOV:
+					R = adr & LOWER8;
+					break;
+				case ADD:
+					r += (byte) RAM[adr];
+					R = r & LOWER8;
+					break;
+				case SUB:
+					r -= (byte) RAM[adr];
+					R = r & LOWER8;
+					break;
+				case MULT:
+					r *= (byte) RAM[adr];
+					R = r & LOWER8;
+					break;
+				case DIV:
+					r /= (byte) RAM[adr];
+					R = r & LOWER8;
+					break;
+				case JUMP:
 					PC = adr;
-					return false; // Ikke inkrementere PC!!
-				}
-				break;
-			case JZERO:
-				if (R == 0) {
-					PC = adr;
-					return false; // Ikke inkrementere PC!!
-				}
-				break;
-			case STOP:
-				stop();
-				return true;
+					return false; // Unngå ++PC;
+				case JNEG:
+					if (r < 0) {
+						PC = adr;
+						return false; // Ikke inkrementere PC!!
+					}
+					break;
+				case JZERO:
+					if (r == 0) {
+						PC = adr;
+						return false; // Ikke inkrementere PC!!
+					}
+					break;
+				case STOP:
+					stop();
+					return true;
 
-			default:
-				throw new IllegalArgumentException("[stepProgram] Ugyldig opcode!\nPC=" + PC + " OPCODE " + (RAM[PC] & UPPERMID8));
+				default:
+					String errorMsg = "";
+					if (curr_op.getVal() == 0)
+						errorMsg += "[TIPS] Har du husket å avslutte programmet med STOP?\n";
+					errorMsg += "[stepProgram] Ugyldig opcode!\nPC=" + PC + " OPCODE " + (curr_op);
+					throw new IllegalArgumentException(errorMsg);
+			}
+		} catch (Exception e) {
+			//String feilMelding = ArrayIndexOutOfBoundsException.getMessage();
+			if (e instanceof IllegalArgumentException) throw e;
+			String feilMelding = "UTENFOR ADRESSEOMRÅDET!\nPC=" + PC + " current op: " + curr_op + " adresse / variabel" + adr;
+			throw new IllegalArgumentException(feilMelding);
 		}
 		++PC; // Inkrementer programtelleren
 		return false;
@@ -153,13 +170,6 @@ public class M
 		return PC;
 	}
 
-	public int oversettAdresse(int adresse) throws IllegalArgumentException
-	{
-		int adr = adresse + minneområde;
-		if (adr > 255) throw new IllegalArgumentException("Utenfor adresseområdet!");
-		return adr;
-	}
-
 	public boolean loadIntoRam(int[] program)
 	{
 		if (program.length > RAM_SIZE) return false;
@@ -184,6 +194,7 @@ public class M
 	{
 		input.setSuppliers(s, cSupplier);
 	}
+
 	public void reset()
 	{
 		minneområde = 0;

@@ -1,7 +1,6 @@
 package virtualm.debugger;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -11,7 +10,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import virtualm.debugger.Debug.DebugPane;
 import virtualm.logikk.M;
-import virtualm.logikk.Parser;
+import virtualm.logikk.Parser.Parser;
 
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
@@ -20,8 +19,8 @@ import virtualm.logikk.Parser;
  */
 public class DebuggerGUI extends Application
 {
-	public static final double WIDTH = 1024d;
-	public static final double HEIGHT = 768d;
+	public static final double WIDTH = 1200d;
+	public static final double HEIGHT = 1000d;
 	private static final String TITLE = "Virtual M debugger";
 
 	private M virtualM;
@@ -50,13 +49,17 @@ public class DebuggerGUI extends Application
 
 		virtualM.setSupplier(DebuggerGUI::hentHeltall, DebuggerGUI::hentBokstav); // Metode referanse!!!
 		menyBar = new Meny(this);
+
 		setupLayout();
 		setupButtons();
 		setupDebugPane();
 		setupKnappActions();
+
 		root.getChildren().add(bp);
 		bp.setTop(menyBar);
+
 		primaryStage.setScene(scene);
+		primaryStage.setResizable(false);
 		primaryStage.show();
 	}
 
@@ -68,8 +71,8 @@ public class DebuggerGUI extends Application
 	private void setupLayout()
 	{
 		codeView = new TextArea();
-		codeView.setMinHeight(HEIGHT - 100);
-		codeView.setMinWidth(WIDTH - 350);
+		codeView.setPrefHeight(HEIGHT - 200);
+		codeView.setPrefWidth(WIDTH - 500);
 		bp.setCenter(codeView);
 	}
 
@@ -94,8 +97,12 @@ public class DebuggerGUI extends Application
 				printAlert("Inget program lastet!");
 				return;
 			}
-			virtualM.executeProgram();
-			debugPane.oppdater();
+			try {
+				virtualM.executeProgram();
+				debugPane.oppdater();
+			} catch (Exception e) {
+				printAlert("Feil\n" + e.getMessage());
+			}
 		});
 		step.setOnAction(event -> {
 			if (virtualM.emptyRam()) {
@@ -119,7 +126,7 @@ public class DebuggerGUI extends Application
 
 	private void setupDebugPane()
 	{
-		debugPane = new DebugPane(virtualM, HEIGHT - 100);
+		debugPane = new DebugPane(virtualM, HEIGHT - 200);
 		bp.setRight(debugPane);
 	}
 
@@ -179,7 +186,7 @@ public class DebuggerGUI extends Application
 		alert.show();
 	}
 
-	public void velgMinneRep(ActionEvent e)
+	public void velgMinneRep()
 	{
 		debugPane.velgMinneRepDialog();
 	}

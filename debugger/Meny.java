@@ -56,7 +56,7 @@ class Meny extends MenuBar
 		avslutt.setOnAction(Meny::quit);
 		lastFil.setOnAction(this::velgFil);
 		fjernTekst.setOnAction(this::fjernTekst);
-		minneRep.setOnAction(parent::velgMinneRep);
+		minneRep.setOnAction(event -> parent.velgMinneRep());
 
 		menuFil.getItems().addAll(lastFil, fjernTekst, avslutt);
 		menuInstillinger.getItems().add(minneRep);

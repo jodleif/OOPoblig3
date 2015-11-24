@@ -42,7 +42,7 @@ public class MemoryDbg
 		int op = (RAM[index] & M.UPPERMID8) >> 16;
 		opcode op1 = opcode.getCode(op);
 
-		return (op1 != null) ? op1.getString() : "" + " (" + op + ")";
+		return ((op1 == null) ? "" : op1.getString()) + " (" + op + ")";
 	}
 
 	public SimpleStringProperty getOpcodeParam()
@@ -73,7 +73,7 @@ public class MemoryDbg
 
 			case BINÆRT:
 				memParamFull.set(Integer.toBinaryString(RAM[index]));
-				while (memParamFull.getValue().length() != 24) {
+				while (memParamFull.getValue().length() <= 24) {
 					memParamFull.setValue("0" + memParamFull.getValue());
 				}
 				break;

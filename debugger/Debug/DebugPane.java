@@ -50,8 +50,8 @@ public class DebugPane extends Pane
 
 		tableView.setPrefHeight(DebuggerGUI.HEIGHT);
 		tableView.setMaxHeight(height - programTeller.getY() * 2);
-		tableView.setPrefWidth(350);
-		tableView.setMaxWidth(350);
+		tableView.setPrefWidth(500);
+		tableView.setMaxWidth(500);
 
 		indexCol = new TableColumn<>("adr");
 		opcodeCol = new TableColumn<>("opcode");
@@ -71,7 +71,7 @@ public class DebugPane extends Pane
 			register.setText(registerString);
 			programTeller.setText(programTellerString);
 		} else {
-			register.setText(registerString + String.valueOf(virtualm.getR()));
+			register.setText(registerString + String.valueOf(virtualm.getR()) + " (" + String.valueOf((byte) virtualm.getR()) + ")");
 			programTeller.setText(programTellerString + String.valueOf(virtualm.getPC()));
 			minneMapping.forEach(e -> e.update());
 			tableView.getSelectionModel().select(virtualm.getPC()); // Markere gjeldene rad! under step run
@@ -92,6 +92,7 @@ public class DebugPane extends Pane
 
 		tableView.getColumns().forEach(e -> e.setSortable(false));
 		tableView.getColumns().forEach(e -> e.setEditable(false));
+
 	}
 
 	private void kopleOppMotMinne()
