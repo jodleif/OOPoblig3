@@ -258,6 +258,13 @@ public class Parser
 		return arr;
 	}
 
+	/**
+	 * For å tyde kode som ikke er i assembler format
+	 * kan brukes for å teste M sin kompabilitet med "maskinkode" på heltallsform
+	 *
+	 * @param oper opcodes på integer format (byte)
+	 * @return formatert på M sitt format (instruksjon<<16 + eventuell verdi)
+	 */
 	private static int[] simpleParser(int[] oper)
 	{
 		ArrayList<Integer> mellomLagring = new ArrayList<>();
