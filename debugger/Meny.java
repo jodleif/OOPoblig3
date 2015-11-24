@@ -24,15 +24,14 @@ class Meny extends MenuBar
 	private Menu menuInstillinger;
 	private Menu menuHelp;
 
-
 	private FileChooser filÅpner;
 
 	private MenuItem lastFil;
 	private MenuItem fjernTekst;
 	private MenuItem avslutt;
-
 	private MenuItem minneRep;
-	private DebuggerGUI parent;
+
+	private DebuggerGUI parent; // Referanse til hovedvinduet
 
 	public Meny(DebuggerGUI parent) throws IOException
 	{
@@ -62,6 +61,11 @@ class Meny extends MenuBar
 		menuInstillinger.getItems().add(minneRep);
 	}
 
+	/**
+	 * Sette opp dialogen for åpning av kode-dokumenter
+	 *
+	 * @throws IOException
+	 */
 	private void setupFileChooser() throws IOException
 	{
 		filÅpner = new FileChooser();
@@ -73,6 +77,10 @@ class Meny extends MenuBar
 		);
 	}
 
+	/**
+	 * Velg fil til å åpne dialog
+	 * @param e for å passe inn i "setOnAction"
+	 */
 	private void velgFil(ActionEvent e)
 	{
 		try {
@@ -87,11 +95,19 @@ class Meny extends MenuBar
 		}
 	}
 
+	/**
+	 * Avslutt programmet!
+	 * @param actionEvent ubrukt paramteter for å passe til en onactionevent metode
+	 */
 	private static void quit(ActionEvent actionEvent)
 	{
 		System.exit(0);
 	}
 
+	/**
+	 * Nullstill tekst i kodevinduet
+	 * @param e ubrukt parameter for å "passe" til en OnActionEvent metode
+	 */
 	private void fjernTekst(ActionEvent e)
 	{
 		parent.settCodeViewTekst("");

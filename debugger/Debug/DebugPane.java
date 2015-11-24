@@ -42,6 +42,9 @@ public class DebugPane extends Pane
 		oppdater();
 	}
 
+	/**
+	 * Setter opp mesteparten av elementene i denne panen
+	 */
 	private void initPane()
 	{
 		register = new Text();
@@ -65,6 +68,9 @@ public class DebugPane extends Pane
 
 	}
 
+	/**
+	 * Oppdaterer tabeller og felter med informasjon fra den "virtuelle maskinen" virtualm
+	 */
 	public void oppdater()
 	{
 		if (virtualm == null) {
@@ -78,8 +84,12 @@ public class DebugPane extends Pane
 		}
 	}
 
+	/**
+	 * Bygger cols i tabellen
+	 */
 	private void byggOppColumns()
 	{
+		// Sette "fabrikker" for celleverdier.
 		indexCol.setCellValueFactory(p -> p.getValue().getIndexString());
 		opcodeCol.setCellValueFactory(p -> p.getValue().getOpcodeParam());
 		memCol.setCellValueFactory(p -> p.getValue().getMemParam());
@@ -90,11 +100,15 @@ public class DebugPane extends Pane
 		tableView.getColumns().add(memCol);
 		tableView.getColumns().add(memColFull);
 
+		// Hindre bruker i å endre på innholdet
 		tableView.getColumns().forEach(e -> e.setSortable(false));
 		tableView.getColumns().forEach(e -> e.setEditable(false));
 
 	}
 
+	/**
+	 * Kopler minnet i virtualM til de ulike memorydbg klassene
+	 */
 	private void kopleOppMotMinne()
 	{
 		minneMapping = FXCollections.observableArrayList();
@@ -105,6 +119,10 @@ public class DebugPane extends Pane
 		tableView.setItems(minneMapping);
 	}
 
+	/**
+	 * Endre hvilket format "minne-fullt" skal vises i.
+	 * @param rep binært, desimalt, heksadesimalt
+	 */
 	private void setMinneRep(MinneRepresentasjon rep)
 	{
 		for (MemoryDbg dbg : minneMapping) {
@@ -113,6 +131,9 @@ public class DebugPane extends Pane
 		oppdater();
 	}
 
+	/**
+	 * Vis dialog for å endre "minne-fullt" representasjon
+	 */
 	public void velgMinneRepDialog()
 	{
 		ChoiceDialog<MinneRepresentasjon> dialog = new ChoiceDialog<>(MinneRepresentasjon.DESIMAL, minneReperesentasjon);

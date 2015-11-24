@@ -37,6 +37,9 @@ public class Parser
 	 * Første pass av "kompilering"
 	 * Modifiserer koden kun på en måte: "Labels" fjernes.
 	 *
+	 * Lagrer alle variabler, og tilegner heltallsverdier , (eller adresser for labels) som brukes
+	 * i andre pass av kompileringen
+	 *
 	 * @return antall linjer
 	 */
 	private static int førstePass()
@@ -53,6 +56,13 @@ public class Parser
 		return effektiveLinjer;
 	}
 
+	/**
+	 * Behandler en linje i første pass. Kan returnere null dersom det er en ugyldig kodelinje
+	 *
+	 * @param linje       En kodelinje
+	 * @param linjeNummer (forrige) linjenummer
+	 * @return det samme som den fikk inn, UNTATT dersom linjen startet med en label, da blir denne fjernet
+	 */
 	private static String førstePassLinje(String linje, int linjeNummer)
 	{
 		String[] token = linje.split(" ");
@@ -88,6 +98,11 @@ public class Parser
 		return linje;
 	}
 
+	/**
+	 * Fjerne første "element" i String tabellen. Brukes for å fjerne en .lable fra starten av en kodelinje
+	 * @param tokens linjen splittet opp på " "
+	 * @return linje tabellen fra og med indeks 1
+	 */
 	private static String fjernFørsteElement(String[] tokens)
 	{
 		String result = "";
@@ -98,6 +113,14 @@ public class Parser
 		return result;
 	}
 
+	/**
+	 * Andre-pass i kompileringen.
+	 * Funksjon for å behandle en kodelinje
+	 * @param linje kodelinje
+	 * @param programLengde total lengde på programmet (brukes for å finne "første ledige" minne adresse
+	 * @param linjeNummer linjenummeret - brukes blant annet for feilmeldinger
+	 * @return integer verdi av kodelinjen.
+	 */
 	private static Integer parseLinje(String linje, int programLengde, int linjeNummer)
 	{
 
@@ -121,12 +144,13 @@ public class Parser
 
 	/**
 	 * Behandler adresse avhengig av om det er minneadresser eller verdier!
+	 * Brukes på ANDRE pass i kompileringen
 	 *
 	 * @param op            operasjon på "adressen"(eller konstant verdi)
 	 * @param tokenEtter    "adressen" eller variablen som skal behandles
 	 * @param programLengde total lengde på programmet (slik det blir i minnet på den virtuelle maskinen)
 	 * @param linjeNummer   hvilken linje som tolkes
-	 * @return
+	 * @return Heltallsverdi av linjen (som kan tydes av den virtuelle maskinen M)
 	 * @throws IllegalArgumentException
 	 */
 	private static Integer behandleAdresse(opcode op, String tokenEtter, int programLengde, int linjeNummer) throws IllegalArgumentException
@@ -140,24 +164,40 @@ public class Parser
 		return adresseEllerVariabel(tokenEtter, programLengde);
 	}
 
+	/**
+	 * Brukes for å behandle "variabler" eksempel store 0
+	 * @param adresse >0< fra eksemplet over
+	 * @param programLengde total lengde på programmet. Dette må vites da minne "allokeres" etter programmet
+	 * @return heltalls verdi for adressen
+	 * @throws IllegalArgumentException
+	 */
 	private static Integer adresseEllerVariabel(String adresse, int programLengde) throws IllegalArgumentException
 	{
 		if (!variabler.containsKey(adresse))
 			throw new IllegalArgumentException("Fant ikke variabel! Parsing feil!!!\nVariabel: " + adresse);
-		int adr = variabler.get(adresse) + programLengde;
-		return adr;
+		return variabler.get(adresse) + programLengde;
 	}
 
+	/**
+	 * Behandle en label i koden. (Vil kun forekomme etter jump type instruksjoner)
+	 * labels forran instruksjoner blir fjernet i første passet i kompileringen
+	 * @param adresse tekst-verdi på label
+	 * @return heltallsverdi for adressen i koden den skal hoppe til
+	 */
 	private static Integer label(String adresse)
 	{
 		if (!labels.containsKey(adresse)) {
 			throw new IllegalArgumentException("Fant ikke label!\nSjekk: " + adresse);
 		}
-		int adr = labels.get(adresse);
-		return adr;
+		return labels.get(adresse);
 	}
 
-
+	/**
+	 * Behandle en konstant-verdi i koden. F.eks RSET >10< der 10 er konstanten
+	 * @param konstant 8bits heltallsverdi, IKKE en adresse
+	 * @param linjeNummer linjenummeret instruksjonen er på
+	 * @return verdi av "konstanten"
+	 */
 	private static Integer konstant(String konstant, int linjeNummer)
 	{
 		try {
@@ -170,7 +210,15 @@ public class Parser
 		}
 	}
 
-	public static int[] kodeTilRam(String kode) throws IllegalArgumentException
+
+	/**
+	 * Gjør assembler kode til "bit" kode
+	 *
+	 * @param kode lang string med hele kode teksten.
+	 * @return en tabell som kan "lastes" rett inn i minnet på M-maskinen
+	 * @throws IllegalArgumentException
+	 */
+	public static int[] assembler(String kode) throws IllegalArgumentException
 	{
 		kodefil = kode.split("\n");
 
@@ -195,6 +243,11 @@ public class Parser
 		return arrayListToInt(liste);
 	}
 
+	/**
+	 * Kopiere ut av arraylist til integer-tabell
+	 * @param liste arraylist med heltalls-objekter
+	 * @return tabell fra arraylist
+	 */
 	private static int[] arrayListToInt(ArrayList<Integer> liste)
 	{
 		int[] arr = new int[liste.size()];
@@ -203,5 +256,22 @@ public class Parser
 			arr[i++] = nr;
 		}
 		return arr;
+	}
+
+	private static int[] simpleParser(int[] oper)
+	{
+		ArrayList<Integer> mellomLagring = new ArrayList<>();
+		for (int i = 0; i < oper.length; ++i) {
+			int opercode = oper[i];
+			if ((opercode >= 10 && opercode <= 13) || opercode == 50) {
+				mellomLagring.add(opercode << 16);
+			} else {
+				++i;
+				opercode <<= 16; // Skift opercode til sin "plass"
+				opercode += oper[i];
+				mellomLagring.add(opercode);
+			}
+		}
+		return arrayListToInt(mellomLagring);
 	}
 }

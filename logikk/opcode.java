@@ -7,6 +7,10 @@ package virtualm.logikk;
  */
 public enum opcode
 {
+
+	/**
+	 * Enumerering av mulige assembler koder, og deres tilhørende integer verdier
+	 */
 	IREAD (10, "IREAD"), // Ingen param
 	IWRITE (11, "IWRITE"), // Ingen param
 	CREAD (12, "CREAD"), // Ingen param
@@ -27,6 +31,9 @@ public enum opcode
 	EMPTY(0, " ");
 
 
+	/*
+	Lokale variable for opcode enum
+	 */
 	private int val;
 	private String valS;
 
@@ -36,9 +43,6 @@ public enum opcode
 		this.valS = valS;
 	}
 
-	public String getString(){
-		return valS;
-	}
 
 	public int getVal(){
 		return val;
@@ -55,8 +59,8 @@ public enum opcode
 
 	public static opcode getCode(String code)
 	{
-		for(opcode op : opcode.values()){
-			if (op.getString().equals(code.toUpperCase()))
+		for (opcode op : opcode.values()) {
+			if (op.toString().equals(code.toUpperCase()))
 				return op;
 		}
 		if (code.equals("MOV")) return opcode.RSET; // MOV ~ RSET

@@ -11,8 +11,9 @@ import java.util.function.Supplier;
 /**
  * Created by Jo Øivind Gjernes on 23.11.2015.
  * <p>
- * Sup
- * <p>
+ * Selve den virtuelle maskinen. Tolker 32bits heltall der første 16bits er satt av til instruksjonen og
+ * siste 16bits er satt av til verdier eller adresser.
+ * Foreløpig brukes kun bit 0-7 og bit 16-23
  * <p>
  * Minnet ser slik ut:
  * RAM[ADRESSE] = 00000000_AAAAAAAA_UUUUUUUU_BBBBBBBB
@@ -26,14 +27,12 @@ public class M
 	public final static int RAM_SIZE = 256;
 
 	public final static int FLAGS = 0b01111111_00000000_00000000_00000000; // Eventuelle FLAGG
-	public final static int UPPERMID8 = 0b00000000_11111111_00000000_00000000; // Unngå negative tall
-	public final static int LOWER16 = 0b00000000_00000000_11111111_11111111;
-	public final static int LOWER8 = 0b00000000_00000000_00000000_11111111;
-	//public final static int NEGFLAG = 0b00000001_00000000_00000000_00000000; // Tester å markere ting som variabler i minnet
+	public final static int UPPERMID8 = 0b00000000_11111111_00000000_00000000; // Brukes for å velge verdien i "instruksjons" området
+	public final static int LOWER16 = 0b00000000_00000000_11111111_11111111; // Brukes for å velge de laveste 16 bits
+	public final static int LOWER8 = 0b00000000_00000000_00000000_11111111; // Brukes for å velge de laveste 8 bits
 
 
 	private int[] RAM; // Eller holder det med en byte-array?
-	private int minneområde;
 	private int R; // Register
 	private int PC; // Programteller
 	private Output output; // Håndterer output
@@ -45,7 +44,6 @@ public class M
 		output = new Output();
 		input = new Input();
 		RAM = new int[RAM_SIZE];
-		minneområde = 0;
 		R = 0;
 		PC = 0;
  /* Initialisering av instansvariabler */
@@ -54,7 +52,7 @@ public class M
 	public void loadProgram(String filsti)
 	{
 		String kodeFraFil = FilIO.lesFil(filsti); // Laster inn alle linjer fra fil.
-		int[] program = Parser.kodeTilRam(kodeFraFil); // "oversetter" til bytecode
+		int[] program = Parser.assembler(kodeFraFil); // "oversetter" til bytecode
 		loadIntoRam(program); // Laster inn programmet i starten av minnet
 	}
 
@@ -174,7 +172,6 @@ public class M
 	{
 		if (program.length > RAM_SIZE) return false;
 		reset();
-		minneområde = program.length;
 		System.arraycopy(program, 0, RAM, 0, program.length);
 		return true;
 	}
@@ -197,7 +194,6 @@ public class M
 
 	public void reset()
 	{
-		minneområde = 0;
 		PC = 0;
 		R = 0;
 		Arrays.fill(RAM, 0);

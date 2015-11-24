@@ -42,7 +42,7 @@ public class MemoryDbg
 		int op = (RAM[index] & M.UPPERMID8) >> 16;
 		opcode op1 = opcode.getCode(op);
 
-		return ((op1 == null) ? "" : op1.getString()) + " (" + op + ")";
+		return ((op1 == null) ? "" : op1.toString()) + " (" + op + ")";
 	}
 
 	public SimpleStringProperty getOpcodeParam()

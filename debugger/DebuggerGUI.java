@@ -68,6 +68,9 @@ public class DebuggerGUI extends Application
 		launch(args);
 	}
 
+	/**
+	 * Oppretter og plasserer codeview sentrert i layout
+	 */
 	private void setupLayout()
 	{
 		codeView = new TextArea();
@@ -77,6 +80,9 @@ public class DebuggerGUI extends Application
 	}
 
 
+	/**
+	 * Oppretter knapper
+	 */
 	private void setupButtons()
 	{
 		lastTilRam = new Button("Last kode til RAM");
@@ -88,6 +94,9 @@ public class DebuggerGUI extends Application
 		bp.setBottom(knappPane);
 	}
 
+	/**
+	 * Tilegner "event handlers" for knappene
+	 */
 	private void setupKnappActions()
 	{
 		lastTilRam.setOnAction((event) -> lastTekstTilRam());
@@ -124,12 +133,18 @@ public class DebuggerGUI extends Application
 		});
 	}
 
+	/**
+	 * Setter opp sidepanel med debuginformasjon
+	 */
 	private void setupDebugPane()
 	{
 		debugPane = new DebugPane(virtualM, HEIGHT - 200);
 		bp.setRight(debugPane);
 	}
 
+	/**
+	 * "Kompilere" assembler og laste det inn i den virtuelle maskinen
+	 */
 	private void lastTekstTilRam()
 	{
 		int[] programTilRam;
@@ -139,7 +154,7 @@ public class DebuggerGUI extends Application
 				printAlert("Ingen kode skrevet inn!");
 				return;
 			}
-			programTilRam = Parser.kodeTilRam(s);
+			programTilRam = Parser.assembler(s);
 			if (programTilRam != null) {
 				virtualM.loadIntoRam(programTilRam);
 				statusLinje.setText("Program lastet ok!");
@@ -150,11 +165,20 @@ public class DebuggerGUI extends Application
 		}
 	}
 
+	/**
+	 * Spesifisere tekst i Kodevinduet (brukes foreløpig kun for å nullstille teksten
+	 * @param tekst tekst
+	 */
 	void settCodeViewTekst(String tekst)
 	{
 		this.codeView.setText(tekst);
 	}
 
+	/**
+	 * Funksjon for å "hente" bokstav fra brukeren (trengs for instruksjonen cread)
+	 * Returnerer en streng (garantert lengre enn 0) Kun den første bokstaven i strengen brukes i implementasjonen
+	 * @return String med inputen i dialogboksen.
+	 */
 	private static String hentBokstav()
 	{
 		while (true) {
@@ -165,6 +189,10 @@ public class DebuggerGUI extends Application
 		}
 	}
 
+	/**
+	 * Lik hentbokstav, men denne henter et heltall. (brukes for IREAD)
+	 * @return heltall
+	 */
 	private static int hentHeltall()
 	{
 		while (true) {
@@ -180,12 +208,20 @@ public class DebuggerGUI extends Application
 		}
 	}
 
+	/**
+	 * Vis feilmelding
+	 * @param s tekst i feilmelding
+	 */
 	public static void printAlert(String s)
 	{
 		Alert alert = new Alert(Alert.AlertType.ERROR, s);
+		alert.setHeaderText("Feil!");
 		alert.show();
 	}
 
+	/**
+	 * Aksessmeny for å sette hvilken minnereperesentasjon minne-full skal vise
+	 */
 	public void velgMinneRep()
 	{
 		debugPane.velgMinneRepDialog();
