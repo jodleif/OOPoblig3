@@ -42,17 +42,14 @@ public class Parser
 	private static int førstePass()
 	{
 		int effektiveLinjer = 0;
-		ArrayList<String> behandletKodefil = new ArrayList<>();
 		for (int j = 0; j < kodefil.length; ++j) {
 			String behandlet = førstePassLinje(kodefil[j], effektiveLinjer);
 			if (behandlet != null) {
 				++effektiveLinjer;
-				behandletKodefil.add(behandlet);
+				kodefil[j] = (behandlet);
 			}
 		}
-		String[] tomromFjernet = new String[behandletKodefil.size()];
-		behandletKodefil.toArray(tomromFjernet);
-		kodefil = tomromFjernet;
+
 		return effektiveLinjer;
 	}
 
@@ -71,13 +68,15 @@ public class Parser
 			fjernFørsteElem = true;
 		}
 
+		if (token.length < tokenNummer + 1)
+			throw new IllegalArgumentException("Ingen instruksjon etter .label? Linje: " + (linjeNummer + 1));
 		opcode op = opcode.getCode(token[tokenNummer]);
 
 		if (op == opcode.INVALID) return null;
 
 		if (token.length > tokenNummer + 1) {
 			tokenNummer++;
-			if ((token[tokenNummer].charAt(0) != ';') && (op != opcode.MOV)) {
+			if ((token[tokenNummer].charAt(0) != ';') && (op != opcode.RSET)) {
 				if (!variabler.containsKey(token[1])) {
 					variabler.put(token[1], variabler.size()); // Antall variabler == variabler.size()
 				}
@@ -136,7 +135,7 @@ public class Parser
 		// Ikke etterfulgt av noe
 		if (op.getVal() >= 10 && op.getVal() <= 13) return i;
 		if (op.getVal() == 50) return i;
-		if (op.getVal() == opcode.MOV.getVal()) return konstant(tokenEtter, linjeNummer);
+		if (op.getVal() == opcode.RSET.getVal()) return konstant(tokenEtter, linjeNummer);
 		if (op.getVal() >= 40 && op.getVal() <= 42) return label(tokenEtter);
 		return adresseEllerVariabel(tokenEtter, programLengde);
 	}
@@ -182,11 +181,16 @@ public class Parser
 		int størrelseIMinnet = førstePass();
 
 		if (kodefil.length == 0) throw new IllegalArgumentException("Tom kode!");
-		int linjeNummer = 0;
+		int linjeNummer = 1;
 		for (String linje : kodefil) {
-			++linjeNummer;
-			Integer i = parseLinje(linje, størrelseIMinnet, linjeNummer);
-			if (i != null) liste.add(i);
+			Integer i = 0;
+			if (linje.length() != 0) {
+				i = parseLinje(linje, størrelseIMinnet, linjeNummer);
+			}
+			if (i != null && i != 0) {
+				liste.add(i);
+				++linjeNummer;
+			}
 		}
 		return arrayListToInt(liste);
 	}

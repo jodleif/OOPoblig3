@@ -87,7 +87,7 @@ public class M
 				case STORE:
 					RAM[adr] = R & LOWER8;
 					break;
-				case MOV:
+				case RSET:
 					R = adr & LOWER8;
 					break;
 				case ADD:

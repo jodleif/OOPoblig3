@@ -13,7 +13,7 @@ public enum opcode
 	CWRITE (13, "CWRITE"), // Ingen param
 	LOAD (20, "LOAD"),
 	STORE (21, "STORE"),
-	MOV (22, "MOV"),
+	RSET(22, "RSET"),
 	ADD (30, "ADD"),
 	SUB (31, "SUB"),
 	MULT (32, "MULT"),
@@ -59,7 +59,7 @@ public enum opcode
 			if (op.getString().equals(code.toUpperCase()))
 				return op;
 		}
-		if (code.equals("RSET")) return opcode.MOV; // Følge spesifikasjon
+		if (code.equals("MOV")) return opcode.RSET; // MOV ~ RSET
 		return opcode.INVALID;
 	}
 
