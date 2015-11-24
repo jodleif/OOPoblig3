@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  * Default konstruksjon printer man til console
  * Hvis man tilegner en "consumer" funskjon, sendes output dit isteden.
  */
-public class Output
+class Output
 {
 	private boolean stdout = true;
 	private Deque<String> outputBuffer;

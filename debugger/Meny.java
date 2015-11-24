@@ -18,7 +18,7 @@ import java.io.IOException;
  * 1. Prøve ut hvordan det funker å extende et vanlig menyobjekt
  * 2. Unngå at "DebuggerGUI" fila blir enda mer rotete
  */
-public class Meny extends MenuBar
+class Meny extends MenuBar
 {
 	private Menu menuFil;
 	private Menu menuInstillinger;
@@ -75,9 +75,16 @@ public class Meny extends MenuBar
 
 	private void velgFil(ActionEvent e)
 	{
-		String path = filÅpner.showOpenDialog(null).getAbsolutePath();
-		String tekst = FilIO.lesFil(path);
-		parent.settCodeViewTekst(tekst);
+		try {
+			String path = filÅpner.showOpenDialog(null).getAbsolutePath();
+			String tekst = FilIO.lesFil(path);
+			parent.settCodeViewTekst(tekst);
+		} catch (Exception exep) {
+			// NullPointerException hvis man trykker AVBRYT når man åpner fil!
+			if (!(exep instanceof NullPointerException)) {
+				DebuggerGUI.printAlert("Feil under lasting av fil!\n" + exep.getMessage());
+			}
+		}
 	}
 
 	private static void quit(ActionEvent actionEvent)

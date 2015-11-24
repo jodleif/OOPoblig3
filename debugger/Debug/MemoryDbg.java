@@ -37,7 +37,7 @@ public class MemoryDbg
 		return indexString;
 	}
 
-	public String getOpcode()
+	private String getOpcode()
 	{
 		int op = (RAM[index] & M.UPPERMID8) >> 16;
 		opcode op1 = opcode.getCode(op);
@@ -59,7 +59,8 @@ public class MemoryDbg
 	{
 		return memParamFull;
 	}
-	public Integer getMem()
+
+	private Integer getMem()
 	{
 		return RAM[index] & M.LOWER16;
 	}

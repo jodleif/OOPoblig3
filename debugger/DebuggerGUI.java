@@ -173,7 +173,7 @@ public class DebuggerGUI extends Application
 		}
 	}
 
-	private static void printAlert(String s)
+	public static void printAlert(String s)
 	{
 		Alert alert = new Alert(Alert.AlertType.ERROR, s);
 		alert.show();

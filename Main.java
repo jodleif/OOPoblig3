@@ -7,6 +7,15 @@ import virtualm.logikk.M;
  * Created by Jo Øivind Gjernes on 12.11.2015.
  *
  * Oblig 3 - Objektorientert Programmering
+ *
+ * BRUK:
+ *
+ * Kjøre program i console:
+ * java virtualm.Main kodefil.txt
+ *
+ * Starte GUI:
+ * java virtualm.Main
+ *
  */
 public class Main
 {

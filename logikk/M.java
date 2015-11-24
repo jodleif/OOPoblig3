@@ -27,7 +27,7 @@ public class M
 	public final static int FLAGS = 0b01111111_00000000_00000000_00000000; // Eventuelle FLAGG
 	public final static int UPPERMID8 = 0b00000000_11111111_00000000_00000000; // Unngå negative tall
 	public final static int LOWER16 = 0b00000000_00000000_11111111_11111111;
-	public final static int VARFLAG = 0b00000001_00000000_00000000_00000000; // Tester å markere ting som variabler i minnet
+	//public final static int VARFLAG = 0b00000001_00000000_00000000_00000000; d/ Tester å markere ting som variabler i minnet
 
 
 	private int[] RAM; // Eller holder det med en byte-array?

@@ -11,7 +11,7 @@ import java.util.function.Supplier;
  * Default konstruksjon henter den input fra console
  * hvis du tilegner den en "supplier" funksjon vil den hente verdier fra denne funksjonen!
  */
-public class Input
+class Input
 {
 	private boolean stdin = true;
 
