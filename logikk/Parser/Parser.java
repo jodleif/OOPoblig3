@@ -25,11 +25,6 @@ public class Parser
 	public static LinkedHashMap<String, Integer> labels;
 	public static String[] kodefil;
 
-	public Parser()
-	{
-
-	}
-
 	/**
 	 * Første pass av "kompilering" Modifiserer koden kun på en måte:
 	 * "Labels" fjernes.

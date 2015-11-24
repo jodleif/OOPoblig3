@@ -1,0 +1,31 @@
+rset -128
+store a
+rset 10
+store newline
+rset 1
+store inkrement
+rset 127 
+store var
+.topp load var ; Starter med printe 127-0
+iwrite
+sub inkrement
+store var
+jneg .new2
+jump .new
+.bunn load a ; Printe fra -128->-1
+iwrite
+add inkrement
+store a
+jzero .exit
+jump .new2
+.exit load newline
+cwrite
+STOP
+
+.new load newline  ; "Function 1"
+cwrite
+jump .topp
+
+.new2 load newline  ; "Function 2"
+cwrite
+jump .bunn
